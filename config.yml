@@ -6,3 +6,11 @@ listen:
   type: port
   bind_ip: 127.0.0.1
   port: 1234
+mongodb:
+  host: localhost
+  port: 27017
+  database: user-service
+  auth_db:
+  username:
+  password:
+  collection: users
