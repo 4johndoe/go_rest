@@ -21,7 +21,7 @@ func NewHandler() handlers.Handler {
 }
 
 func (h *handler) Register(router *httprouter.Router) {
-	router.GET(usersUrl, h.GetList)
+	router.HandlerFunc(http.MethodGet, usersUrl, h.GetList)
 	router.POST(userUrl, h.CreateUser)
 	router.GET(userUrl, h.GetUserByUuID)
 	router.PUT(userUrl, h.UpdateUser)
@@ -29,7 +29,7 @@ func (h *handler) Register(router *httprouter.Router) {
 	router.DELETE(userUrl, h.DeleteUser)
 }
 
-func (h *handler) GetList(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func (h *handler) GetList(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, err := w.Write([]byte("this is list of users"))
 	if err != nil {
