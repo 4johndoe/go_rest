@@ -21,6 +21,18 @@ func main() {
 
 	cfg := config.GetConfig()
 
+	//cfgMongo := cfg.MongoDB
+	//mongoDBClient, err := mongodb.NewClient(context.Background(), cfgMongo.Host, cfgMongo.Port, cfgMongo.Username,
+	//	cfgMongo.Password, cfgMongo.Database, cfgMongo.AuthDB)
+	//if err != nil {
+	//	fmt.Errorf("panic")
+	//}
+	//
+	//storage := db.NewStorage(mongoDBClient, cfgMongo.Collection, logger)
+	//
+	//users, err := storage.FindAll(context.Background())
+	//fmt.Println(users)
+
 	logger.Info("register user handler")
 	handler := user.NewHandler(logger)
 	handler.Register(router)
