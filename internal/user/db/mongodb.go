@@ -90,12 +90,14 @@ func (d *db) Update(ctx context.Context, user user.User) error {
 	}
 
 	d.logger.Trace("Matched %d documents and modified %d", result.MatchedCount, result.ModifiedCount)
+
+	return nil
 }
 
 func (d *db) Delete(ctx context.Context, id string) error {
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return fmt.Errorf("failed to convert hex to objectid: hex: %s", user.ID)
+		return fmt.Errorf("failed to convert hex to objectid: hex: %s", id)
 	}
 
 	filter := bson.M{"_id": objectID}
