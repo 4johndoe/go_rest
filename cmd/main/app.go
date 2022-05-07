@@ -19,7 +19,7 @@ func main() {
 
 	listener, err := net.Listen("tcp", "127.0.0.1:1234")
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	server := &http.Server{
