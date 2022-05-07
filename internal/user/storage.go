@@ -3,6 +3,7 @@ package user
 import "context"
 
 type Storage interface {
+	FindAll(ctx context.Context) ([]User, error)
 	Create(ctx context.Context, user User) (string, error)
 	FindOne(ctx context.Context, id string) (User, error)
 	Update(ctx context.Context, user User) error
