@@ -3,7 +3,10 @@ package user
 import (
 	"github.com/julienschmidt/httprouter"
 	"net/http"
+	"restapi/internal/handlers"
 )
+
+var _ handlers.Handler = &handler{}
 
 const (
 	usersUrl = "/users"
@@ -11,6 +14,10 @@ const (
 )
 
 type handler struct {
+}
+
+func NewHandler() handlers.Handler {
+	return &handler{}
 }
 
 func (h *handler) Register(router *httprouter.Router) {
