@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -41,7 +42,10 @@ func (d *db) FindOne(ctx context.Context, id string) (u user.User, err error) {
 
 	result := d.collection.FindOne(ctx, filter)
 	if result.Err() != nil {
-		// todo 404
+		if errors.Is(result.Err(), mongo.ErrNoDocuments) {
+			// TODO ErrEntityNotFound
+			return u, fmt.Errorf("not found")
+		}
 		return u, fmt.Errorf("failed to find one user by id: %s", id)
 	}
 	if err = result.Decode(&u); err != nil {
@@ -52,7 +56,40 @@ func (d *db) FindOne(ctx context.Context, id string) (u user.User, err error) {
 }
 
 func (d *db) Update(ctx context.Context, user user.User) error {
-	panic("implement me")
+	objectID, err := primitive.ObjectIDFromHex(user.ID)
+	if err != nil {
+		return fmt.Errorf("failed to convert hex to objectid: hex: %s", user.ID)
+	}
+
+	filter := bson.M{"_id": objectID}
+
+	userBytes, err := bson.Marshal(user)
+	if err != nil {
+		return fmt.Errorf("failed to marshal user, error: %v", err)
+	}
+
+	var updateUserObj bson.M
+	err = bson.Unmarshal(userBytes, &updateUserObj)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshall user bytes, error: %v", err)
+	}
+
+	delete(updateUserObj, "_id")
+
+	update := bson.M{
+		"$set": updateUserObj,
+	}
+
+	result, err := d.collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return fmt.Errorf("failed to execute update user query, error: %v", err)
+	}
+	if result.MatchedCount == 0 {
+		// TODO ErrEntityNotFound
+		return fmt.Errorf("not found")
+	}
+
+	d.logger.Trace("Matched %d documents and modified %d", result.MatchedCount, result.ModifiedCount)
 }
 
 func (d *db) Delete(ctx context.Context, id string) error {
